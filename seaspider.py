@@ -29,7 +29,13 @@ def main():
         crawl_result = crawl_target(target_url)
         print(crawl_result['status_code'], ' ', target_url)
         soup = bs4.BeautifulSoup(crawl_result['text'], features='html.parser')
-        links = soup.findAll('a', attrs={'href': re.compile('^https?://')})
+        pattern = '^https?://'
+
+        # Apply domain restriction
+        if len(sys.argv) >= 3:
+            pattern += sys.argv[2]
+
+        links = soup.findAll('a', attrs={'href': re.compile(pattern)})
         print(len(links), ' links detected')
 
         for link in links:
