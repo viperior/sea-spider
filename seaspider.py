@@ -20,6 +20,8 @@ def crawl_target(target_url):
     return crawl_result
 
 def main():
+    """Crawl a given starting URL, collect all links from its HTML, and then
+    recursively crawl those links, while avoiding duplicate crawls."""
     crawl_queue = {}
 
     if len(sys.argv) < 2:
