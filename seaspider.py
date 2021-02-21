@@ -5,19 +5,11 @@ import sys
 import time
 from tqdm import tqdm
 
-def check_url(url):
-    url_check_result = {}
-    r = requests.get(url, headers={'User-Agent': 'Sea'})
-    url_check_result['status_code'] = r.status_code
-    print('\n', url_check_result['status_code'], ' ', url)
-    return url_check_result
-
 def crawl_from_origin(origin_url, domain_restriction=''):
     """Crawl a given starting URL, collect all links from its HTML, and then
     recursively crawl those links, while avoiding duplicate crawls."""
     crawl_queue = {}
     crawl_result = crawl_target(origin_url)
-    print(crawl_result['status_code'], ' ', origin_url, ' ORIGIN')
     soup = bs4.BeautifulSoup(crawl_result['text'], features='html.parser')
     pattern = '^https?://' + domain_restriction
     links = soup.findAll('a', attrs={'href': re.compile(pattern)})
@@ -29,19 +21,17 @@ def crawl_from_origin(origin_url, domain_restriction=''):
         if not url in crawl_queue.keys():
             crawl_queue[url] = {}
 
-    for key in crawl_queue.keys():
-        print(key)
-
     progress_bar_label = 'Crawling ' + str(len(crawl_queue)) + ' URLs'
 
     for key in tqdm(crawl_queue.keys(), desc=progress_bar_label):
-        crawl_queue[key]['crawl_result'] = check_url(key)
+        crawl_queue[key]['crawl_result'] = crawl_target(key)
         time.sleep(0.1)
 
 def crawl_target(target_url):
     crawl_result = {}
     r = requests.get(target_url, headers={'User-Agent': 'Sea'})
     crawl_result['status_code'] = r.status_code
+    print('\n', crawl_result['status_code'], ' ', target_url)
     crawl_result['text'] = r.text
     return crawl_result
 
