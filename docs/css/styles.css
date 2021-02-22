@@ -3,6 +3,7 @@ body {
 }
 .emoji-cloud {
     margin: 8px auto 8px auto;
+    max-width: 800px;
     width: 80%;
 }
 table {
