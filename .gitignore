@@ -129,4 +129,5 @@ dmypy.json
 .pyre/
 
 # Sea Spider custom ignore rules
-db/
+data/
+config.json
