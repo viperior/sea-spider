@@ -1,0 +1,11 @@
+body {
+    text-align: center;
+}
+.emoji-cloud {
+    margin: 8px auto 8px auto;
+    width: 80%;
+}
+table {
+    margin: 8px auto 8px auto;
+    text-align: left;
+}
