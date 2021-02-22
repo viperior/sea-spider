@@ -2,6 +2,7 @@ import bs4
 import find_errors
 import glob
 import json
+import logging
 import re
 import requests
 import sys
@@ -25,6 +26,7 @@ def crawl_recursively(url, depth=1):
             crawl_recursively(link, depth + 1)
 
 def crawl_target(url):
+    logging.debug('Considering crawl target: ' + url)
     url_id = get_url_id(url)
     crawl_file_name_pattern = 'data/' + str(url_id) + '.json'
     crawl_file_exists = len(glob.glob(crawl_file_name_pattern)) > 0
@@ -108,6 +110,7 @@ def register_new_url_id(id, url):
         json.dump(url_id_map, url_id_map_file, indent=4)
 
 def main():
+    logging.basicConfig(filename='data/example.log', level=logging.DEBUG)
     origin_url = 'https://' + get_config_value('origin_domain')
     crawl_recursively(origin_url)
     find_errors.find_errors()
