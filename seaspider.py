@@ -1,4 +1,5 @@
 import bs4
+from csv import reader
 import find_errors
 import glob
 import json
@@ -34,6 +35,7 @@ def crawl_target(url):
     if not crawl_file_exists:
         print('Crawling: ', url)
         r = requests.get(url, headers={'User-Agent': 'Sea'})
+        logging.info('Python requests call completed: ' + str(r.status_code) + ' ' + url)
         crawl_result = {
             "id": url_id,
             "url": url,
@@ -110,9 +112,26 @@ def register_new_url_id(id, url):
         json.dump(url_id_map, url_id_map_file, indent=4)
 
 def main():
-    logging.basicConfig(filename='data/example.log', level=logging.DEBUG)
-    origin_url = 'https://' + get_config_value('origin_domain')
-    crawl_recursively(origin_url)
+    logging.basicConfig(filename='data/seaspider.log', level=logging.ERROR)
+    operation_mode = get_config_value('operation_mode')
+
+    if operation_mode == 'domain-scan':
+        origin_domain = get_config_value('origin_domain')
+        origin_url = 'https://' + origin_domain
+        logging.info('Performing domain-wide scan on :' + origin_domain)
+        crawl_recursively(origin_url, depth=1)
+    elif operation_mode == 'csv-file':
+        # open file in read mode
+        with open('data/in.csv', 'r') as read_obj:
+            # pass the file object to reader() to get the reader object
+            csv_reader = reader(read_obj)
+            # Iterate over each row in the csv using reader object
+            for row in csv_reader:
+                # row variable is a list that represents a row in csv
+                crawl_recursively(row, depth=1)
+    else:
+        logging.error('Operation mode unrecognized: ' + operation_mode)
+
     find_errors.find_errors()
 
 main()
