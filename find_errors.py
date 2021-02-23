@@ -113,5 +113,3 @@ def generate_error_report(stats, response_codes):
 
     with open('docs/crawl-stats-report.html', 'w') as f:
         f.write(doc.render())
-
-find_errors()
