@@ -3,6 +3,7 @@ from dominate.tags import *
 from dominate.util import raw
 import glob
 import json
+from time import gmtime, strftime
 
 def display_statistics(stats):
     output = 'Statistics:'
@@ -111,5 +112,8 @@ def generate_error_report(stats, response_codes):
                         td(response_codes[key]['response_code'])
                         td(response_codes[key]['url'])
 
-    with open('docs/crawl-stats-report.html', 'w') as f:
+    output_file_path = 'docs/crawl-stats-report.' + \
+        strftime("%Y%m%dT%H%M%SZ", gmtime()) + '.html'
+
+    with open(output_file_path, 'w') as f:
         f.write(doc.render())
