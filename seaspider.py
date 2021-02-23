@@ -36,6 +36,7 @@ def crawl_target(url):
         print('Crawling: ', url)
         r = requests.get(url, headers={'User-Agent': 'Sea'})
         logging.info('Python requests call completed: ' + str(r.status_code) + ' ' + url)
+        time.sleep(0.2)
         crawl_result = {
             "id": url_id,
             "url": url,
@@ -114,24 +115,42 @@ def register_new_url_id(id, url):
 def main():
     logging.basicConfig(filename='data/seaspider.log', level=logging.ERROR)
     operation_mode = get_config_value('operation_mode')
+    allow_outside_starting_domain = get_config_value('allow_outside_starting_domain')
+    origin_domain = get_config_value('origin_domain')
+
+    if allow_outside_starting_domain:
+        logging.warn('Scan mode allows crawling outside origin domain')
+    
+    if (not allow_outside_starting_domain) \
+        and (origin_domain == False or len(origin_domain) < 1):
+        error_message = 'Domain restriction active but no domain filter set'
+        logging.error(error_message)
+        raise ValueError(error_message)
 
     if operation_mode == 'domain-scan':
-        origin_domain = get_config_value('origin_domain')
+        logging.info('Performing a domain-wide crawl')
         origin_url = 'https://' + origin_domain
         logging.info('Performing domain-wide scan on :' + origin_domain)
         crawl_recursively(origin_url, depth=1)
-    elif operation_mode == 'csv-file':
+        find_errors.find_errors()
+    elif operation_mode == 'csv':
+        logging.info('Reading data from CSV')
         # open file in read mode
-        with open('data/in.csv', 'r') as read_obj:
-            # pass the file object to reader() to get the reader object
-            csv_reader = reader(read_obj)
-            # Iterate over each row in the csv using reader object
-            for row in csv_reader:
-                # row variable is a list that represents a row in csv
-                crawl_recursively(row, depth=1)
+        csv_file_path = 'data/in.csv'
+        
+        if len(glob.glob(csv_file_path)) > 0:
+            with open(csv_file_path, 'r') as read_obj:
+                # pass the file object to reader() to get the reader object
+                csv_reader = reader(read_obj)
+                # Iterate over each row in the csv using reader object
+                for row in csv_reader:
+                    # row variable is a list that represents a row in csv
+                    crawl_recursively(row[0], depth=1)
+
+                find_errors.find_errors()
+        else:
+            logging.error('Could not find file: ' + csv_file_path)
     else:
         logging.error('Operation mode unrecognized: ' + operation_mode)
-
-    find_errors.find_errors()
 
 main()
