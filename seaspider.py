@@ -127,7 +127,7 @@ def main():
         logging.error(error_message)
         raise ValueError(error_message)
 
-    if operation_mode == 'domain-scan':
+    if operation_mode == 'domain_scan':
         logging.info('Performing a domain-wide crawl')
         origin_url = 'https://' + origin_domain
         logging.info('Performing domain-wide scan on :' + origin_domain)
