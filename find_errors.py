@@ -34,7 +34,7 @@ def find_errors():
             response_code = int(json_data['response_code'])
             url = json_data['url']
 
-            if response_code == 200 and not url.find('http:'):
+            if response_code == 200 and not 'http:' in url:
                 ok_count += 1
             else:
                 problem_count += 1
@@ -94,7 +94,7 @@ def generate_error_report(stats, response_codes):
                 response_code = int(response_codes[key]['response_code'])
                 url = response_codes[key]['url']
                 
-                if response_code == 200 and not url.find('http:'):
+                if response_code == 200 and not 'http:' in url:
                     emoji = '&#10004;'
                 else:
                     emoji = '&#128293;'
