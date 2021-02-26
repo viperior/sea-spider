@@ -1,6 +1,8 @@
 {
     "allow_outside_starting_domain": false,
-    "max_crawl_count": 2000,
-    "max_crawl_depth": 3,
-    "origin_domain": "example.com"
+    "max_crawl_depth": 1,
+    "origin_domain": "example.com",
+    "csv_file_path": "data/in.csv",
+    "operation_mode": "domain_scan",
+    "delay_between_crawls": 0.2
 }

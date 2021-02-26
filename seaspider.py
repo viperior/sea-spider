@@ -1,11 +1,31 @@
 import bs4
+from csv import reader
 import find_errors
 import glob
 import json
+import logging
 import re
 import requests
 import sys
 import time
+
+def crawl_csv_url_list():
+    logging.info('Reading data from CSV')
+    csv_file_path = get_config_value('csv_file_path')
+    
+    if len(glob.glob(csv_file_path)) > 0:
+        with open(csv_file_path, 'r') as read_obj:
+            csv_reader = reader(read_obj)
+            for row in csv_reader:
+                crawl_recursively(row[0], depth=1)
+    else:
+        log_error_and_crash_with_message('Could not find file: ' + csv_file_path)
+
+def crawl_from_origin_url():
+    url = get_config_value('origin_domain')
+    origin_url = 'https://' + url 
+    logging.info('Performing domain-wide scan on :' + origin_url)
+    crawl_recursively(origin_url, depth=1)
 
 def crawl_recursively(url, depth=1):
     url = url.split('#', 1)[0]
@@ -25,6 +45,7 @@ def crawl_recursively(url, depth=1):
             crawl_recursively(link, depth + 1)
 
 def crawl_target(url):
+    logging.debug('Considering crawl target: ' + url)
     url_id = get_url_id(url)
     crawl_file_name_pattern = 'data/' + str(url_id) + '.json'
     crawl_file_exists = len(glob.glob(crawl_file_name_pattern)) > 0
@@ -32,6 +53,9 @@ def crawl_target(url):
     if not crawl_file_exists:
         print('Crawling: ', url)
         r = requests.get(url, headers={'User-Agent': 'Sea'})
+        logging.info('Python requests call completed: ' + str(r.status_code) + ' ' + url)
+        delay_between_crawls = get_config_value('delay_between_crawls')
+        time.sleep(delay_between_crawls)
         crawl_result = {
             "id": url_id,
             "url": url,
@@ -95,6 +119,10 @@ def get_config_value(key):
 
     return config_json[key]
 
+def log_error_and_crash_with_message(message):
+    logging.error(message)
+    raise ValueError(message)
+
 def register_new_url_id(id, url):
     if len(glob.glob('data/url_id_map.json')) > 0:
         with open('data/url_id_map.json', 'r') as url_id_map_file:
@@ -107,9 +135,31 @@ def register_new_url_id(id, url):
     with open('data/url_id_map.json', 'w') as url_id_map_file:
         json.dump(url_id_map, url_id_map_file, indent=4)
 
+def validate_config_file():
+    allow_outside_starting_domain = get_config_value('allow_outside_starting_domain')
+    origin_domain = get_config_value('origin_domain')
+
+    if allow_outside_starting_domain:
+        logging.warn('Scan mode allows crawling outside origin domain')
+    
+    if (not allow_outside_starting_domain) and (origin_domain == False or \
+        len(origin_domain) < 1):
+        log_error_and_crash_with_message('Domain restriction active but no domain filter set')
+
 def main():
-    origin_url = 'https://' + get_config_value('origin_domain')
-    crawl_recursively(origin_url)
+    logging.basicConfig(filename='data/seaspider.log', level=logging.ERROR)
+    validate_config_file()
+    operation_mode = get_config_value('operation_mode')
+
+    if operation_mode == 'domain_scan':
+        crawl_from_origin_url()
+    elif operation_mode == 'csv':
+        crawl_csv_url_list()
+    else:
+        log_error_and_crash_with_message('Operation mode unrecognized: ' + \
+            operation_mode + '\nPlease use \'domain_scan\' or \'csv\' as ' + \
+            'the operation_mode value and try again.')
+        pass
     find_errors.find_errors()
 
 main()
