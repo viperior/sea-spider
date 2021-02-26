@@ -142,10 +142,8 @@ def validate_config_file():
     if allow_outside_starting_domain:
         logging.warn('Scan mode allows crawling outside origin domain')
     
-    if (not allow_outside_starting_domain) \
-        and (origin_domain == False 
-            or len(origin_domain) < 1 \
-            or origin_domain.find('example.com')):
+    if (not allow_outside_starting_domain) and (origin_domain == False or \
+        len(origin_domain) < 1):
         log_error_and_crash_with_message('Domain restriction active but no domain filter set')
 
 def main():
