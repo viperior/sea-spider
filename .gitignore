@@ -130,4 +130,5 @@ dmypy.json
 
 # Sea Spider custom ignore rules
 data/
+docs/*report*
 config.json
