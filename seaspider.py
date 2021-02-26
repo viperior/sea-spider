@@ -154,13 +154,13 @@ def main():
 
     if operation_mode == 'domain_scan':
         crawl_from_origin_url()
-        find_errors.find_errors()
     elif operation_mode == 'csv':
         crawl_csv_url_list()
-        find_errors.find_errors()
     else:
         log_error_and_crash_with_message('Operation mode unrecognized: ' + \
             operation_mode + '\nPlease use \'domain_scan\' or \'csv\' as ' + \
             'the operation_mode value and try again.')
+        pass
+    find_errors.find_errors()
 
 main()
