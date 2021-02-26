@@ -3,5 +3,6 @@
     "max_crawl_depth": 1,
     "origin_domain": "example.com",
     "csv_file_path": "data/in.csv",
-    "operation_mode": "domain_scan"
+    "operation_mode": "domain_scan",
+    "delay_between_crawls": 0.2
 }

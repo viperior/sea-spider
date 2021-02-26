@@ -54,7 +54,8 @@ def crawl_target(url):
         print('Crawling: ', url)
         r = requests.get(url, headers={'User-Agent': 'Sea'})
         logging.info('Python requests call completed: ' + str(r.status_code) + ' ' + url)
-        time.sleep(0.2)
+        delay_between_crawls = get_config_value('delay_between_crawls')
+        time.sleep(delay_between_crawls)
         crawl_result = {
             "id": url_id,
             "url": url,
