@@ -19,7 +19,9 @@ def crawl_csv_url_list():
             for row in csv_reader:
                 crawl_recursively(row[0], depth=1)
     else:
-        log_error_and_crash_with_message('Could not find file: ' + csv_file_path)
+        log_error_and_crash_with_message(
+            'Could not find file: ' + csv_file_path
+        )
 
 def crawl_from_origin_url():
     url = get_config_value('origin_domain')
@@ -68,12 +70,12 @@ def crawl_target(url):
             json.dump(crawl_result, outfile, indent=4)
 
 def extract_links_from_html(html):
-    allow_outside_starting_domain = get_config_value('allow_outside_starting_domain')
+    allow_outside = get_config_value('allow_outside_starting_domain')
     origin_domain = get_config_value('origin_domain')
     soup = bs4.BeautifulSoup(html, features='html.parser')
     pattern = '^https?://'
 
-    if not allow_outside_starting_domain:
+    if not allow_outside:
         pattern += origin_domain
 
     links = soup.findAll('a', attrs={'href': re.compile(pattern)})
