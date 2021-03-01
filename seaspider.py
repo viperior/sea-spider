@@ -19,7 +19,9 @@ def crawl_csv_url_list():
             for row in csv_reader:
                 crawl_recursively(row[0], depth=1)
     else:
-        log_error_and_crash_with_message('Could not find file: ' + csv_file_path)
+        log_error_and_crash_with_message(
+            'Could not find file: ' + csv_file_path
+        )
 
 def crawl_from_origin_url():
     url = get_config_value('origin_domain')
