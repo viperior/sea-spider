@@ -1,4 +1,17 @@
+a:link {
+    color: rgb(116, 148, 0);
+}
+a:visited {
+    color: rgb(37, 116, 0);
+}
 body {
+    background-image:
+        radial-gradient(
+            circle at top right,
+            rgb(3, 29, 0),
+            #11000f 50%
+        );
+    color: rgb(28, 243, 0);
     text-align: center;
 }
 .emoji-cloud {
@@ -6,7 +19,18 @@ body {
     max-width: 800px;
     width: 80%;
 }
+nav ul li {
+    display: inline-block;
+    list-style-type: none;
+    padding: 0px 8px 0px 8px;
+}
 table {
     margin: 8px auto 8px auto;
     text-align: left;
+}
+table tr.problem,
+.problem a:link,
+.problem a:visited {
+    background-color: rgba(200, 90, 90, 0.3);
+    color: rgb(228, 205, 0);
 }
