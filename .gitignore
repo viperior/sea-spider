@@ -133,3 +133,4 @@ data/
 docs/*report*
 docs/latest.html
 config.json
+next_release_readme.md
