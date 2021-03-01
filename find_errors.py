@@ -36,10 +36,16 @@ def find_errors():
 
             if response_code == 200 and not 'http:' in url:
                 ok_count += 1
+                emoji = get_emoji_html('checkmark')
+                status = 'ok'
             else:
                 problem_count += 1
+                emoji = get_emoji_html('red_x')
+                status = 'problem'
 
             response_codes[int(url_id)] = {
+                'status': status,
+                'emoji': emoji,
                 'response_code': response_code,
                 'url': url
             }
@@ -74,9 +80,26 @@ def generate_error_report(stats, response_codes):
         meta(charset='utf-8')
         meta(description='Crawl Statistics')
         link(rel='stylesheet', href='css/styles.css')
+        link(rel='preconnect', href='https://fonts.gstatic.com')
+        link(
+            href='https://fonts.googleapis.com/css2?family=DotGothic16&display=swap',
+            rel='stylesheet'
+            )
 
     with doc:
         h1('Crawl Statistics')
+        nav_items = [
+            ['All reports', '../docs/'],
+            ['Last report', '../docs/latest.html']
+        ]
+        
+        with nav():
+            with ul():
+                for nav_item in nav_items:
+                    with li():
+                        a(nav_item[0], href=nav_item[1])
+
+        div('Report timestamp: ' + get_current_timestamp_utc())
         
         with table():
             with thead():
@@ -91,29 +114,59 @@ def generate_error_report(stats, response_codes):
 
         with div(cls='emoji-cloud'):
             for key in response_codes.keys():
-                response_code = int(response_codes[key]['response_code'])
                 url = response_codes[key]['url']
-                
-                if response_code == 200 and not 'http:' in url:
-                    emoji = '&#10004;'
-                else:
-                    emoji = '&#128293;'
-                
-                span(raw(emoji), title=url)
+                emoji = response_codes[key]['emoji']
+                title_text = str(response_codes[key]['response_code']) + \
+                    ' ' + url
+                a(raw(emoji), title=title_text, href=url)
 
         with table():
             with thead():
                 with tr():
-                    th('Response code')
+                    th('Status')
+                    th('Response')
                     th('URL')
             with tbody():
                 for key in response_codes.keys():
-                    with tr():
+                    if response_codes[key]['status'] == 'ok':
+                        table_row_class = 'ok'
+                    else:
+                        table_row_class = 'problem'
+
+                    with tr(cls=table_row_class):
+                        td(raw(response_codes[key]['emoji']))
                         td(response_codes[key]['response_code'])
-                        td(response_codes[key]['url'])
+                        
+                        with td():
+                            url = response_codes[key]['url']
+                            a(url, href=url)
 
     output_file_path = 'docs/crawl-stats-report.' + \
-        strftime("%Y%m%dT%H%M%SZ", gmtime()) + '.html'
+        get_current_timestamp_utc() + '.html'
 
     with open(output_file_path, 'w') as f:
         f.write(doc.render())
+
+    with open('docs/latest.html', 'w') as f:
+        f.write(doc.render())
+
+def get_current_timestamp_utc():
+    return strftime("%Y%m%dT%H%M%SZ", gmtime())
+
+def get_emoji_html(emoji_name):
+    prefix = '&#'
+    postfix = ';'
+    
+    if emoji_name == 'checkmark':
+        code = '9989'
+    elif emoji_name == 'fire':
+        code = '128293'
+    elif emoji_name == 'rainbow':
+        code = '127752'
+    elif emoji_name == 'red_x':
+        code = '10060'
+    else:
+        code = '10060'
+
+    emoji_html = prefix + code + postfix
+    return emoji_html
