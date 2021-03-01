@@ -80,6 +80,11 @@ def generate_error_report(stats, response_codes):
         meta(charset='utf-8')
         meta(description='Crawl Statistics')
         link(rel='stylesheet', href='css/styles.css')
+        link(rel='preconnect', href='https://fonts.gstatic.com')
+        link(
+            href='https://fonts.googleapis.com/css2?family=DotGothic16&display=swap',
+            rel='stylesheet'
+            )
 
     with doc:
         h1('Crawl Statistics')
@@ -119,7 +124,7 @@ def generate_error_report(stats, response_codes):
             with thead():
                 with tr():
                     th('Status')
-                    th('Response code')
+                    th('Response')
                     th('URL')
             with tbody():
                 for key in response_codes.keys():
