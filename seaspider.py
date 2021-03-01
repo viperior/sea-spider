@@ -70,12 +70,12 @@ def crawl_target(url):
             json.dump(crawl_result, outfile, indent=4)
 
 def extract_links_from_html(html):
-    allow_outside_starting_domain = get_config_value('allow_outside_starting_domain')
+    allow_outside = get_config_value('allow_outside_starting_domain')
     origin_domain = get_config_value('origin_domain')
     soup = bs4.BeautifulSoup(html, features='html.parser')
     pattern = '^https?://'
 
-    if not allow_outside_starting_domain:
+    if not allow_outside:
         pattern += origin_domain
 
     links = soup.findAll('a', attrs={'href': re.compile(pattern)})
