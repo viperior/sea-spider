@@ -128,6 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# VS Code settings
+.vscode
+
 # Sea Spider custom ignore rules
 data/
 docs/*report*
