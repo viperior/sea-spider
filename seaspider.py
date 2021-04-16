@@ -4,6 +4,7 @@ import find_errors
 import glob
 import json
 import logging
+import os
 import re
 import requests
 import sys
@@ -68,6 +69,15 @@ def crawl_target(url):
 
         with open(crawl_file_name_pattern, 'w') as outfile:
             json.dump(crawl_result, outfile, indent=4)
+
+def create_empty_log_file(log_file_directory, log_file_filename):
+    log_file_path = f"{log_file_directory}/{log_file_filename}"
+    
+    if not os.path.exists(log_file_directory):
+        os.mkdir(log_file_directory)
+    
+    if not os.path.exists(log_file_path):
+        open(log_file_path, 'a').close()
 
 def extract_links_from_html(html):
     allow_outside = get_config_value('allow_outside_starting_domain')
@@ -142,14 +152,25 @@ def validate_config_file():
     origin_domain = get_config_value('origin_domain')
 
     if allow_outside_starting_domain:
-        logging.warn('Scan mode allows crawling outside origin domain')
+        logging.warning('Scan mode allows crawling outside origin domain')
     
     if (not allow_outside_starting_domain) and (origin_domain == False or \
         len(origin_domain) < 1):
         log_error_and_crash_with_message('Domain restriction active but no domain filter set')
 
 def main():
-    logging.basicConfig(filename='data/seaspider.log', level=logging.ERROR)
+    log_file_directory = 'data'
+    log_file_filename = 'seaspider.log'
+    log_file_path = 'data/seaspider.log'
+    create_empty_log_file(log_file_directory, log_file_filename)
+
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=logging.WARNING,
+        datefmt='%Y-%m-%d %H:%M:%S',
+        filename=log_file_path
+    )
+
     validate_config_file()
     operation_mode = get_config_value('operation_mode')
 
@@ -164,4 +185,5 @@ def main():
         pass
     find_errors.find_errors()
 
-main()
+if __name__ == '__main__':
+    main()
